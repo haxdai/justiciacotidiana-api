@@ -43,6 +43,7 @@ import org.bson.types.ObjectId;
  * @author Hasdai Pacheco
  * 
  * Clase utilitaria para realizar operaciones en MongoDB.
+ * Basada en la clase utilitaria de https://github.com/mxabierto/avisos
  */
 public class MongoInterface {
     /**Cadena de conexión a MongoDB*/
@@ -80,7 +81,11 @@ public class MongoInterface {
      * @throws UnknownHostException 
      */
     private MongoInterface() throws UnknownHostException {
-        clientURI = new MongoClientURI(MONGOURL);
+        if (null != System.getenv("MONGO_URL")) {
+            clientURI = new MongoClientURI(System.getenv("MONGO_URL"));
+        } else {
+            clientURI = new MongoClientURI(MONGOURL);
+        }
         client = new MongoClient(clientURI);
         mongoDB = client.getDB(clientURI.getDatabase());
         if (null != clientURI.getUsername()) {
