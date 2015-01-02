@@ -99,9 +99,9 @@ public class MongoInterface {
      * Agrega un elemento a una colección.
      * @param collectionName Nombre de la colección donde se agregará el elemento.
      * @param item Elemento a insertar.
-     * @return true si la inserción fue exitosa. false en otro caso.
+     * @return ID del elemento insertado. null en otro caso.
      */
-    public boolean addItem(String collectionName, BasicDBObject item) {
+    public String addItem(String collectionName, BasicDBObject item) {
         DBCollection tCol = mongoDB.getCollection(collectionName);
         item.put(FIELD_CREATED, Utils.isoformater.format(new Date()));
         
@@ -111,9 +111,9 @@ public class MongoInterface {
         try {
             tCol.insert(item);
         } catch (MongoException ex) {
-            return false;
+            return null;
         }
-        return true;
+        return item.getString(FIELD_ID);
     }
     
     /**
