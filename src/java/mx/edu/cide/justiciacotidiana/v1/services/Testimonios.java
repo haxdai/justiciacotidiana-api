@@ -27,6 +27,7 @@ package mx.edu.cide.justiciacotidiana.v1.services;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
+import com.mongodb.util.JSONParseException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.POST;
@@ -92,7 +93,14 @@ public class Testimonios {
         String msg = "";
         String msgStatus = "ERROR";
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        BasicDBObject payload = Testimonio.parse(content);
+        BasicDBObject payload = null;
+        
+        try {
+            payload = Testimonio.parse(content);
+        } catch (JSONParseException ex) {
+            status = Response.Status.BAD_REQUEST;
+            msg = "Unparseable content";
+        }
 
         if (null != payload) {
             try {
