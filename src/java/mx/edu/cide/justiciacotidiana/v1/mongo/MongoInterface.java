@@ -229,8 +229,13 @@ public class MongoInterface {
     public String listItemsAsJSON(String collectionName, BasicDBObject query) {
         DBCursor cursor = findItems(collectionName, query);
         StringBuilder ret = new StringBuilder();
+        long count = 0;
+        
+        if (null != cursor && cursor.hasNext()) {
+            count = cursor.size();
+        }
+        ret.append("{\"count\":").append(count);
         if (cursor.hasNext()) {
-            ret.append("{\"count\":").append(cursor.size());
             ret.append(", \"items\": [");
             try {
                while(cursor.hasNext()) {
@@ -242,8 +247,8 @@ public class MongoInterface {
                cursor.close();
             }
             ret.append("]");
-            ret.append("}");
         }
+        ret.append("}");
         return ret.toString();
     }
     
