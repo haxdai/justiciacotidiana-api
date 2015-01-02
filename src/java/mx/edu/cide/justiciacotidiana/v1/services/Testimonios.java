@@ -92,6 +92,7 @@ public class Testimonios {
     public Response postJson(String content) {
         String msg = "";
         String msgStatus = "ERROR";
+        String upsertedId = "";
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         BasicDBObject payload = null;
         
@@ -104,7 +105,7 @@ public class Testimonios {
 
         if (null != payload) {
             try {
-                mongo.addItem(MongoInterface.COLLECTIONS.TESTIMONIOS, payload);
+                upsertedId = mongo.addItem(MongoInterface.COLLECTIONS.TESTIMONIOS, payload);
                 status = Response.Status.CREATED;
                 msgStatus = "OK";
             } catch (MongoException ex) {
@@ -115,7 +116,10 @@ public class Testimonios {
         }
         
         JSONEntity msgEntity = new JSONEntity();
-        msgEntity.addPair("status", msgStatus);
+        msgEntity.addPair("result", msgStatus);
+        if (null != upsertedId) {
+            msgEntity.addPair("_id", upsertedId);
+        }
         if (msg.length() > 0) {
             msgEntity.addPair("message", msg);
         }
