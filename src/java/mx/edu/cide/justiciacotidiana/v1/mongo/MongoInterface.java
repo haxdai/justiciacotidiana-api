@@ -52,6 +52,8 @@ public class MongoInterface {
     public static final String FIELD_CREATED = "created";
     /**Campo para registrar la fecha de actualización de los elementos*/
     public static final String FIELD_UPDATED = "updated";
+    /**Campo para registrar el ID de los elementos (el id de mongo)*/
+    public static final String FIELD_ID = "_id";
     /**Instancia de la clase*/
     private static MongoInterface instance = null;
     /**URI para la conexión mediante el cliente*/
@@ -102,6 +104,10 @@ public class MongoInterface {
     public boolean addItem(String collectionName, BasicDBObject item) {
         DBCollection tCol = mongoDB.getCollection(collectionName);
         item.put(FIELD_CREATED, Utils.isoformater.format(new Date()));
+        
+        //Eliminar id y updated, si es que viene en el documento.
+        item.remove(FIELD_ID);
+        item.remove(FIELD_UPDATED);
         try {
             tCol.insert(item);
         } catch (MongoException ex) {
@@ -120,6 +126,10 @@ public class MongoInterface {
         DBCollection tCol = mongoDB.getCollection(collectionName);
         newData.put(FIELD_CREATED, query.get(FIELD_CREATED));
         newData.put(FIELD_UPDATED, Utils.isoformater.format(new Date()));
+        
+        //Eliminar id, si es que viene en el documento.
+        newData.remove(FIELD_ID);
+        
         try {
             tCol.update(query, newData);
         } catch (MongoException ex) {
@@ -147,7 +157,7 @@ public class MongoInterface {
      * @return true si la eliminación fue exitosa. false en otro caso.
      */
     public boolean deleteItem(String collectionName, String id) {
-        BasicDBObject query = new BasicDBObject("_id", new ObjectId(id));
+        BasicDBObject query = new BasicDBObject(FIELD_ID, new ObjectId(id));
         return deleteItem(collectionName, query);
     }
     
@@ -194,7 +204,7 @@ public class MongoInterface {
      * @return BasicDBObject con los datos del elemento encontrado, si existe.
      */
     public BasicDBObject findById(String collectionName, String id) {
-        BasicDBObject query = new BasicDBObject("_id", new ObjectId(id));
+        BasicDBObject query = new BasicDBObject(FIELD_ID, new ObjectId(id));
         return (BasicDBObject)findOne(collectionName, query);
     }
     
