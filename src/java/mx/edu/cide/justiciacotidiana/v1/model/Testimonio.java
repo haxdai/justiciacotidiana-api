@@ -28,6 +28,7 @@ package mx.edu.cide.justiciacotidiana.v1.model;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import com.mongodb.util.JSON;
+import com.mongodb.util.JSONParseException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -118,9 +119,17 @@ public class Testimonio {
     @Consumes("application/json")
     @Produces("application/json")
     public Response putJson(String content) {
-        BasicDBObject newData = parse(content);
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         String msg = "ERROR";
+        
+        BasicDBObject newData = null;
+        
+        try {
+            newData = Testimonio.parse(content);
+        } catch (JSONParseException ex) {
+            status = Response.Status.BAD_REQUEST;
+            msg = "Unparseable content";
+        }
         
         if (null != newData) {
             try {
