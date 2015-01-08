@@ -104,7 +104,9 @@ public class Utils {
                 } else if (val instanceof BasicDBList) {
                     ret.append(toJSON((BasicDBList)val));
                 } else if (val instanceof String) {
-                    ret.append("\"").append(val).append("\"");
+                    String _val = (String) val;
+                    _val = _val.replaceAll("\n", "\\\\n");
+                    ret.append("\"").append(_val).append("\"");
                 } else if (val instanceof Date) {
                     ret.append("\"").append(isoformater.format(val)).append("\"");
                 } else {

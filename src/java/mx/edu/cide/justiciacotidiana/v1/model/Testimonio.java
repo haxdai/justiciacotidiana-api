@@ -76,6 +76,8 @@ public class Testimonio {
         
         String checkedVal = obj.getString(FIELDS.CATEGORY);
         if (null == checkedVal || checkedVal.length() == 0) obj = null;
+        checkedVal = obj.getString(FIELDS.CATEGORYID);
+        if (null == checkedVal || checkedVal.length() == 0) obj = null;
         checkedVal = obj.getString(FIELDS.EXPLANATION);
         if (null == checkedVal || checkedVal.length() == 0) obj = null;
         checkedVal = obj.getString(FIELDS.STATE);
@@ -91,6 +93,7 @@ public class Testimonio {
             if (null != checkedVal) obj.remove(FIELDS.CREATED);
             checkedVal = obj.getString(FIELDS.UPDATED);
             if (null != checkedVal) obj.remove(FIELDS.UPDATED);
+            if (obj.keySet().contains(FIELDS.VALID)) obj.remove(FIELDS.VALID);
         }
         return obj;
     }
@@ -100,7 +103,7 @@ public class Testimonio {
      * @return Response con JSON del testimonio si existe.
      */
     @GET
-    @Produces("application/json")
+    @Produces("application/json;charset=utf-8")
     public Response getJson() {
         BasicDBObject internal = Utils.mongo.findById(MongoInterface.COLLECTIONS.TESTIMONIOS, this.id);
         
@@ -117,7 +120,7 @@ public class Testimonio {
      */
     @PUT
     @Consumes("application/json")
-    @Produces("application/json")
+    @Produces("application/json;charset=utf-8")
     public Response putJson(String content) {
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         String msg = "ERROR";
@@ -153,7 +156,7 @@ public class Testimonio {
      * Elimina un testimonio, si existe.
      */
     @DELETE
-    @Produces("application/json")
+    @Produces("application/json;charset=utf-8")
     public Response delete() {
         BasicDBObject toDelete = Utils.mongo.findById(MongoInterface.COLLECTIONS.TESTIMONIOS, this.id);
         String msg = "";
@@ -180,11 +183,12 @@ public class Testimonio {
         public static final String NAME = "name";
         public static final String EMAIL = "email";
         public static final String CATEGORY = "category";
+        public static final String CATEGORYID = "categoryId";
         public static final String EXPLANATION = "explanation";
-        public static final String STATE = "entidadFederativa";
+        public static final String STATE = "state";
         public static final String GENDER = "gender";
         public static final String AGE = "age";
-        public static final String GRADE = "educationLevel";
+        public static final String GRADE = "education";
         public static final String CREATED = "created";
         public static final String UPDATED = "updated";
         public static final String FACEBOOKUSER = "fcbookid";

@@ -103,7 +103,7 @@ public class MongoInterface {
      */
     public String addItem(String collectionName, BasicDBObject item) {
         DBCollection tCol = mongoDB.getCollection(collectionName);
-        item.put(FIELD_CREATED, Utils.isoformater.format(new Date()));
+        item.put(FIELD_CREATED, new Date());
         
         //Eliminar id y updated, si es que viene en el documento.
         item.remove(FIELD_ID);
@@ -125,7 +125,7 @@ public class MongoInterface {
     public boolean updateItem(String collectionName, BasicDBObject query, BasicDBObject newData) {
         DBCollection tCol = mongoDB.getCollection(collectionName);
         newData.put(FIELD_CREATED, query.get(FIELD_CREATED));
-        newData.put(FIELD_UPDATED, Utils.isoformater.format(new Date()));
+        newData.put(FIELD_UPDATED, new Date());
         
         //Eliminar id, si es que viene en el documento.
         newData.remove(FIELD_ID);
