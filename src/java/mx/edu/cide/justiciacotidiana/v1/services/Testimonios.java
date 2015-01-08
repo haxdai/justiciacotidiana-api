@@ -70,7 +70,7 @@ public class Testimonios {
      * @return an instance of java.lang.String
      */
     @GET
-    @Produces("application/json")
+    @Produces("application/json;charset=utf-8")
     public String getJson() {
 //        MultivaluedMap<String, String> params = context.getQueryParameters();
 //        for (String param : params.keySet()) {
@@ -88,7 +88,7 @@ public class Testimonios {
      */
     @POST
     @Consumes("application/json")
-    @Produces("application/json")
+    @Produces("application/json;charset=utf-8")
     public Response postJson(String content) {
         String msg = "";
         String msgStatus = "ERROR";
@@ -105,6 +105,7 @@ public class Testimonios {
 
         if (null != payload) {
             try {
+                payload.put(Testimonio.FIELDS.VALID, false);
                 upsertedId = mongo.addItem(MongoInterface.COLLECTIONS.TESTIMONIOS, payload);
                 status = Response.Status.CREATED;
                 msgStatus = "OK";
