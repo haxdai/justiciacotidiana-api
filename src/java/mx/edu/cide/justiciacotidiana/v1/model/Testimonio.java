@@ -41,9 +41,8 @@ import mx.edu.cide.justiciacotidiana.v1.utils.JSONEntity;
 import mx.edu.cide.justiciacotidiana.v1.utils.Utils;
 
 /**
- *
- * @author Hasdai Pacheco
  * Recurso que encapsula un testimonio en la base de datos.
+ * @author Hasdai Pacheco
  */
 public class Testimonio {
     /**ID del testimonio*/

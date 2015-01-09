@@ -30,6 +30,7 @@ import com.mongodb.BasicDBObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import mx.edu.cide.justiciacotidiana.v1.mongo.MongoInterface;
@@ -140,5 +141,17 @@ public class Utils {
             ret.append("]");
             return ret.toString();
         }
+    }
+    
+    public static boolean validateEmptyStringFields(BasicDBObject tovalidate, List<String> params) {
+        boolean valid = true;
+        for(String key : params) {
+            String val = tovalidate.getString(key);
+            if (null == val || val.length() == 0) {
+                valid = false;
+                break;
+            }
+        }
+        return valid;
     }
 }

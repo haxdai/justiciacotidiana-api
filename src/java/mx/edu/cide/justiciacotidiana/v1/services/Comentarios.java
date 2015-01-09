@@ -28,29 +28,29 @@ package mx.edu.cide.justiciacotidiana.v1.services;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import com.mongodb.util.JSONParseException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.POST;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import mx.edu.cide.justiciacotidiana.v1.model.Testimonio;
+import javax.ws.rs.core.UriInfo;
+import mx.edu.cide.justiciacotidiana.v1.model.Comentario;
 import mx.edu.cide.justiciacotidiana.v1.mongo.MongoInterface;
 import mx.edu.cide.justiciacotidiana.v1.utils.JSONEntity;
 import mx.edu.cide.justiciacotidiana.v1.utils.Utils;
 
 /**
- * REST Web Service
- *
+ * REST Web Service para comentarios.
  * @author Hasdai Pacheco
  */
-@Path("/testimonios")
-public class Testimonios {
+@Path("/comentarios")
+public class Comentarios {
     private static final MongoInterface mongo = MongoInterface.getInstance();
 
     @Context
@@ -59,30 +59,33 @@ public class Testimonios {
     @Context
     private HttpHeaders headers;
 
-    /**
-     * Creates a new instance of TestimoniossResource
+    /** 
+     * Creates a new instance of ComentariosResource
      */
-    public Testimonios() {
+    public Comentarios() {
     }
 
     /**
-     * Retrieves representation of an instance of mx.edu.cide.justiciacotidiana.Testimonios
+     * Retrieves representation of an instance of mx.edu.cide.justiciacotidiana.Comentarios
      * @return an instance of java.lang.String
      */
     @GET
     @Produces("application/json;charset=utf-8")
     public String getJson() {
-//        MultivaluedMap<String, String> params = context.getQueryParameters();
-//        for (String param : params.keySet()) {
-//            String val = params.getFirst(param);
-//            System.out.println("Param:"+param+", value:"+val);
-//        }
+        MultivaluedMap<String, String> params = context.getQueryParameters();
+        String proposalId = params.getFirst(Comentario.FIELDS.PROPOSALID);
+        BasicDBObject query = null;
+        
+        if (null != proposalId && proposalId.length() > 0) {
+           query = new BasicDBObject(Comentario.FIELDS.PROPOSALID, proposalId);
+        }
+
         //System.out.println(headers.getRequestHeader(HttpHeaders.AUTHORIZATION).get(0));
-        return mongo.listItemsAsJSON(MongoInterface.COLLECTIONS.TESTIMONIOS, null);
+        return mongo.listItemsAsJSON(MongoInterface.COLLECTIONS.COMENTARIOS, query);
     }
 
     /**
-     * POST method for creating an instance of TestimonioResource
+     * POST method for creating an instance of Comentario
      * @param content representation for the new resource
      * @return an HTTP response with content of the created resource
      */
@@ -97,7 +100,7 @@ public class Testimonios {
         BasicDBObject payload = null;
         
         try {
-            payload = Testimonio.parse(content);
+            payload = Comentario.parse(content);
         } catch (JSONParseException ex) {
             status = Response.Status.BAD_REQUEST;
             msg = "Unparseable content";
@@ -105,8 +108,8 @@ public class Testimonios {
 
         if (null != payload) {
             try {
-                payload.put(Testimonio.FIELDS.VALID, false);
-                upsertedId = mongo.addItem(MongoInterface.COLLECTIONS.TESTIMONIOS, payload);
+                upsertedId = mongo.addItem(MongoInterface.COLLECTIONS.COMENTARIOS, payload);
+                System.out.println("upserted: "+upsertedId);
                 status = Response.Status.CREATED;
                 msgStatus = "OK";
             } catch (MongoException ex) {
@@ -134,7 +137,7 @@ public class Testimonios {
      * @return Representación JSON del testimonio.
      */
     @Path("{id}")
-    public Testimonio getTestimonio(@PathParam("id") String id) {
-        return Testimonio.getInstance(id);
+    public Comentario getComentario(@PathParam("id") String id) {
+        return Comentario.getInstance(id);
     }
 }
