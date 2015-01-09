@@ -29,6 +29,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import com.mongodb.util.JSON;
 import com.mongodb.util.JSONParseException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -72,19 +74,18 @@ public class Testimonio {
      */
     public static BasicDBObject parse(String content) {
         BasicDBObject obj = (BasicDBObject)JSON.parse(content);
+        String checkedVal = "";
+        List<String> params = new ArrayList<String>();
+        params.add(FIELDS.CATEGORY);
+        //params.add(FIELDS.CATEGORYID);
+        params.add(FIELDS.EXPLANATION);
+        params.add(FIELDS.STATE);
+        params.add(FIELDS.GENDER);
+        params.add(FIELDS.AGE);
         
-        String checkedVal = obj.getString(FIELDS.CATEGORY);
-        if (null == checkedVal || checkedVal.length() == 0) obj = null;
-        checkedVal = obj.getString(FIELDS.CATEGORYID);
-        if (null == checkedVal || checkedVal.length() == 0) obj = null;
-        checkedVal = obj.getString(FIELDS.EXPLANATION);
-        if (null == checkedVal || checkedVal.length() == 0) obj = null;
-        checkedVal = obj.getString(FIELDS.STATE);
-        if (null == checkedVal || checkedVal.length() == 0) obj = null;
-        checkedVal = obj.getString(FIELDS.GENDER);
-        if (null == checkedVal || checkedVal.length() == 0) obj = null;
-        checkedVal = obj.getString(FIELDS.AGE);
-        if (null == checkedVal || checkedVal.length() == 0) obj = null;
+        if (!Utils.validateEmptyStringFields(obj, params)) {
+            return null;
+        }
         
         //Remove unmodifiable fields
         if (null != obj) {

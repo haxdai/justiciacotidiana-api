@@ -228,6 +228,7 @@ public class MongoInterface {
      */
     public String listItemsAsJSON(String collectionName, BasicDBObject query) {
         DBCursor cursor = findItems(collectionName, query);
+        cursor.sort(new BasicDBObject(FIELD_CREATED, -1));
         StringBuilder ret = new StringBuilder();
         long count = 0;
         
