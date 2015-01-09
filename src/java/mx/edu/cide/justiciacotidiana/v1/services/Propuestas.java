@@ -100,6 +100,8 @@ public class Propuestas {
         
         long count = 0;
         DBCursor propuestas = Utils.mongo.findItems(MongoInterface.COLLECTIONS.PROPUESTAS, query);
+        propuestas.sort(new BasicDBObject(Propuesta.FIELDS.CREATED, -1));
+        
         if (null != propuestas && propuestas.hasNext()) {
             count = propuestas.size();
         }

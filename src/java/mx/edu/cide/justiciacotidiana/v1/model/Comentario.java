@@ -27,6 +27,8 @@ package mx.edu.cide.justiciacotidiana.v1.model;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.util.JSON;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -71,19 +73,21 @@ public class Comentario {
         BasicDBObject from = (BasicDBObject)obj.get(FIELDS.FROM);
         String checkedVal = "";
         
-        checkedVal = obj.getString(FIELDS.MESSAGE);
-        if (null == checkedVal || checkedVal.length() == 0) obj = null;
-        checkedVal = obj.getString(FIELDS.PROPOSALID);
-        if (null == checkedVal || checkedVal.length() == 0) obj = null;
-        checkedVal = obj.getString(FIELDS.PARENT);
-        if (null == checkedVal) obj = null;
+        List<String> params = new ArrayList<String>();
+        params.add(FIELDS.MESSAGE);
+        params.add(FIELDS.PROPOSALID);
+        params.add(FIELDS.PARENT);
+        
+        if (!Utils.validateEmptyStringFields(obj, params)) {
+            return null;
+        }
         
         if (null == from) {
-            obj = null; 
-        } else {
-            checkedVal = from.getString(FIELDS.FACEBOOKUSER);
-            if (null == checkedVal || checkedVal.length() == 0) obj = null;
+            return null; 
         }
+        
+        checkedVal = from.getString(FIELDS.FACEBOOKUSER);
+        if (null == checkedVal || checkedVal.length() == 0) obj = null;
         
         //Remove unmodifiable fields
         if (null != obj) {
