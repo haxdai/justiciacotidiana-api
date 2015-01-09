@@ -85,12 +85,10 @@ public class Voto {
         }
         
         String val = obj.getString(FIELDS.VALUE);
-        if (!LIKE.equalsIgnoreCase(val) && !DISLIKE.equalsIgnoreCase(val) && !REFRAIN.equalsIgnoreCase(val)) obj = null;
+        if (!LIKE.equalsIgnoreCase(val) && !DISLIKE.equalsIgnoreCase(val) && !REFRAIN.equalsIgnoreCase(val)) return null;
 
         //Remove unmodifiable fields
-        if (null != obj) {
-            if (null == obj.getString(FIELDS.CREATED)) obj.remove(FIELDS.CREATED);
-        }
+        if (null == obj.getString(FIELDS.CREATED)) obj.remove(FIELDS.CREATED);
 
         return obj;
     }

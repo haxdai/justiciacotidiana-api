@@ -88,13 +88,11 @@ public class Testimonio {
         }
         
         //Remove unmodifiable fields
-        if (null != obj) {
-            checkedVal = obj.getString(FIELDS.CREATED);
-            if (null != checkedVal) obj.remove(FIELDS.CREATED);
-            checkedVal = obj.getString(FIELDS.UPDATED);
-            if (null != checkedVal) obj.remove(FIELDS.UPDATED);
-            if (obj.keySet().contains(FIELDS.VALID)) obj.remove(FIELDS.VALID);
-        }
+        checkedVal = obj.getString(FIELDS.CREATED);
+        if (null != checkedVal) obj.remove(FIELDS.CREATED);
+        checkedVal = obj.getString(FIELDS.UPDATED);
+        if (null != checkedVal) obj.remove(FIELDS.UPDATED);
+        if (obj.keySet().contains(FIELDS.VALID)) obj.remove(FIELDS.VALID);
         return obj;
     }
     
