@@ -49,7 +49,11 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(mx.edu.cide.justiciacotidiana.v1.model.Propuesta.class);
         resources.add(mx.edu.cide.justiciacotidiana.v1.model.Testimonio.class);
+        resources.add(mx.edu.cide.justiciacotidiana.v1.services.Comentarios.class);
+        resources.add(mx.edu.cide.justiciacotidiana.v1.services.Propuestas.class);
         resources.add(mx.edu.cide.justiciacotidiana.v1.services.Testimonios.class);
+        resources.add(mx.edu.cide.justiciacotidiana.v1.services.Votos.class);
     }
 }

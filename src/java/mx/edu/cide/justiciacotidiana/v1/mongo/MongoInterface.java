@@ -259,5 +259,7 @@ public class MongoInterface {
         public static final String TESTIMONIOS = "Testimonios";
         public static final String ENCUESTAS = "Encuestas";
         public static final String COMENTARIOS = "Comentarios";
+        public static final String PROPUESTAS = "Propuestas";
+        public static final String VOTOS = "Votos";
     }
 }
