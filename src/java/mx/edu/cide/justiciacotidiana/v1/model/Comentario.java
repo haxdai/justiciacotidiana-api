@@ -135,5 +135,6 @@ public class Comentario {
         public static final String CREATED = "created";
         public static final String UPDATED = "updated";
         public static final String FACEBOOKUSER = "fcbookid";
+        public static final String FACEBOOKNAME = "name";
     }
 }

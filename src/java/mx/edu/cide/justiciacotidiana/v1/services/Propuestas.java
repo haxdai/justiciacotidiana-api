@@ -29,6 +29,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.MongoException;
+import java.util.Iterator;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -38,7 +39,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import mx.edu.cide.justiciacotidiana.v1.model.Comentario;
+import mx.edu.cide.justiciacotidiana.v1.model.Pregunta;
 import mx.edu.cide.justiciacotidiana.v1.model.Propuesta;
+import mx.edu.cide.justiciacotidiana.v1.model.Respuesta;
 import mx.edu.cide.justiciacotidiana.v1.model.Voto;
 import mx.edu.cide.justiciacotidiana.v1.mongo.MongoInterface;
 import mx.edu.cide.justiciacotidiana.v1.utils.Utils;
@@ -68,7 +71,7 @@ public class Propuestas {
      * @return an instance of java.lang.String
      */
     @GET
-    @Produces("application/json")
+    @Produces("application/json;charset=utf-8")
     public String getJson() {
         MultivaluedMap<String, String> params = context.getQueryParameters();
         String catId = params.getFirst(Propuesta.FIELDS.CATEGORYID);
@@ -123,6 +126,13 @@ public class Propuestas {
                     BasicDBObject commentsContainer = new BasicDBObject("data", comments);
                     propuesta.put(Propuesta.FIELDS.COMMENTS, commentsContainer);
                     
+                    BasicDBObject question = getRelatedQuestion(key);
+                    if (null != question) {
+                        question.remove(Pregunta.FIELDS.CREATED);
+                        question.remove(Pregunta.FIELDS.PROPOSALID);
+                        propuesta.put(Propuesta.FIELDS.QUESTION, question);
+                    }
+                    
                     BasicDBObject votes = new BasicDBObject();
                     
                     //Muy verbose y con muchos niveles, se puede simplificar la estructura
@@ -156,10 +166,12 @@ public class Propuestas {
         BasicDBObject query = new BasicDBObject(Comentario.FIELDS.PROPOSALID, proposalId);
         
         DBCursor com_cur = Utils.mongo.findItems(MongoInterface.COLLECTIONS.COMENTARIOS, query);
+        com_cur.sort(new BasicDBObject(Comentario.FIELDS.CREATED, -1));
         try {
             if (null != com_cur && com_cur.hasNext()) {
                 while (com_cur.hasNext()) {
                     BasicDBObject obj = (BasicDBObject) com_cur.next();
+                    obj.remove(Comentario.FIELDS.PROPOSALID);
                     commentsList.add(obj);
                 }
             }
@@ -167,6 +179,30 @@ public class Propuestas {
             System.out.println("Error al genera lista de comentarios asociada a propuesta");
         }
         return commentsList;
+    }
+    
+    private BasicDBObject getRelatedQuestion(String proposalId) {
+        BasicDBObject query = new BasicDBObject(Pregunta.FIELDS.PROPOSALID, proposalId);
+        BasicDBObject ret = (BasicDBObject)Utils.mongo.findOne(MongoInterface.COLLECTIONS.ENCUESTAS, query);
+        
+        if (null != ret) {
+            String questionId = ret.get("_id").toString();
+            BasicDBList answers = (BasicDBList)ret.get(Pregunta.FIELDS.ANSWERS);
+            Iterator ans_it = answers.iterator();
+            while (ans_it.hasNext()) {
+                BasicDBObject next = (BasicDBObject)ans_it.next();
+                ObjectId ansId = (ObjectId)next.get(Respuesta.FIELDS.MONGOID);
+                String _ansId = ansId.toString();
+                
+                BasicDBObject countQuery = new BasicDBObject();
+                countQuery.put(Respuesta.FIELDS.QUESTIONID, questionId);
+                countQuery.put(Respuesta.FIELDS.ANSWERID, _ansId);
+                
+                long count = Utils.mongo.countItems(MongoInterface.COLLECTIONS.RESPUESTAS, countQuery);
+                next.put("count", count);
+            }
+        }
+        return ret;
     }
     
     private BasicDBList getVotes(String proposalId, String value) {
