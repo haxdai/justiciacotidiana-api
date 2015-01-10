@@ -37,9 +37,9 @@ import mx.edu.cide.justiciacotidiana.v1.mongo.MongoInterface;
 import org.bson.types.ObjectId;
 
 /**
- *
- * @author Hasdai Pacheco.
  * Clase utilitaria.
+ * @author Hasdai Pacheco.
+ *
  */
 public class Utils {
     /**Referencia a la interface con MongoDB*/
@@ -143,15 +143,19 @@ public class Utils {
         }
     }
     
+    /**
+     * Valida una serie de parámetros revisando si existen y no están vacíos.
+     * @param tovalidate Objeto a validar.
+     * @param params Lista de parámetros a validar en el objeto.
+     * @return true si los parámetros existen en el objeto y no están vacíos. false en otro caso.
+     */
     public static boolean validateEmptyStringFields(BasicDBObject tovalidate, List<String> params) {
-        boolean valid = true;
         for(String key : params) {
             String val = tovalidate.getString(key);
             if (null == val || val.length() == 0) {
-                valid = false;
-                break;
+                return false;
             }
         }
-        return valid;
+        return true;
     }
 }

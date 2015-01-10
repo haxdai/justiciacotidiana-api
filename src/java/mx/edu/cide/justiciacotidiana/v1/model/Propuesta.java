@@ -43,6 +43,7 @@ import mx.edu.cide.justiciacotidiana.v1.utils.Utils;
 public class Propuesta {
     /**ID de la propuesta*/
     String id;
+    /**Objeto interno de MongoDB*/
     BasicDBObject internal;
     
     /**
@@ -110,6 +111,10 @@ public class Propuesta {
         return Utils.JSON.toJSON(internal);
     }
     
+    /**
+     * Obtiene la lista de comentarios asociados a una propuesta.
+     * @return Lista de comentarios.
+     */
     private BasicDBList getCommentsList(){
         BasicDBList commentsList = new BasicDBList();
         BasicDBObject query = new BasicDBObject(Comentario.FIELDS.PROPOSALID, this.id);
@@ -128,6 +133,11 @@ public class Propuesta {
         return commentsList;
     }
     
+    /**
+     * Obtiene la lista de votos asociados a una propuesta, de acuerdo a su valor.
+     * @param value Valor del voto.
+     * @return Lista de votos asociados a la propuesta con el valor especificado.
+     */
     private BasicDBList getVotes(String value) {
         BasicDBList votesList = new BasicDBList();
         BasicDBObject query = new BasicDBObject(Voto.FIELDS.PROPOSALID, this.id);
@@ -154,13 +164,26 @@ public class Propuesta {
         return votesList;
     }
     
+    /**
+     * Obtiene la lista de votos a favor relacionados con una propuesta.
+     * @return Lista de votos a favor.
+     */
     private BasicDBList getLikes() {
         return getVotes(Voto.LIKE);
     }
     
+    /**
+     * Obtiene la lista de votos en contra relacionados con una propuesta.
+     * @return Lista de votos en contra.
+     */
     private BasicDBList getDisLikes() {
         return getVotes(Voto.DISLIKE);
     }
+    
+    /**
+     * Obtiene la lista de votos en abstención relacionados con una propuesta.
+     * @return Lista de votos en abstención.
+     */
     private BasicDBList getRefrains() {
         return getVotes(Voto.REFRAIN);
     }

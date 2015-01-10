@@ -43,6 +43,7 @@ import mx.edu.cide.justiciacotidiana.v1.utils.Utils;
 public class Comentario {
     /**ID del comentario*/
     String id;
+    /**Objeto interno de MongoDB*/
     BasicDBObject internal;
     
     /**
@@ -76,28 +77,25 @@ public class Comentario {
         List<String> params = new ArrayList<String>();
         params.add(FIELDS.MESSAGE);
         params.add(FIELDS.PROPOSALID);
-        params.add(FIELDS.PARENT);
         
         if (!Utils.validateEmptyStringFields(obj, params)) {
             return null;
         }
-        
+
         if (null == from) {
             return null; 
         }
-        
+
         checkedVal = from.getString(FIELDS.FACEBOOKUSER);
-        if (null == checkedVal || checkedVal.length() == 0) obj = null;
+        if (null == checkedVal || checkedVal.length() == 0) return null;
         
         //Remove unmodifiable fields
-        if (null != obj) {
-            checkedVal = obj.getString(FIELDS.CREATED);
-            if (null != checkedVal) obj.remove(FIELDS.CREATED);
-            checkedVal = obj.getString(FIELDS.UPDATED);
-            if (null != checkedVal) obj.remove(FIELDS.UPDATED);
-            checkedVal = obj.getString(FIELDS.SWBPAGE);
-            if (null != checkedVal) obj.remove(FIELDS.SWBPAGE);
-        }
+        checkedVal = obj.getString(FIELDS.CREATED);
+        if (null != checkedVal) obj.remove(FIELDS.CREATED);
+        checkedVal = obj.getString(FIELDS.UPDATED);
+        if (null != checkedVal) obj.remove(FIELDS.UPDATED);
+        checkedVal = obj.getString(FIELDS.SWBPAGE);
+        if (null != checkedVal) obj.remove(FIELDS.SWBPAGE);
         return obj;
     }
     
