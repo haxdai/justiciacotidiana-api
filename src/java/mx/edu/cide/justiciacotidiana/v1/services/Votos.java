@@ -105,12 +105,24 @@ public class Votos {
             status = Response.Status.BAD_REQUEST;
             msg = "Unparseable content";
         }
-
         if (null != payload) {
             try {
-                upsertedId = mongo.addItem(MongoInterface.COLLECTIONS.VOTOS, payload);
-                System.out.println("upserted: "+upsertedId);
-                status = Response.Status.CREATED;
+                //Buscar voto del usuario para la misma propuesta
+                BasicDBObject query = new BasicDBObject();
+                query.put(Voto.FIELDS.PROPOSALID, payload.getString(Voto.FIELDS.PROPOSALID));
+                query.put(Voto.FIELDS.FACEBOOKUSER, payload.getString(Voto.FIELDS.FACEBOOKUSER));
+                BasicDBObject lastVote = (BasicDBObject)Utils.mongo.findOne(MongoInterface.COLLECTIONS.VOTOS, query);
+                if(null != lastVote) {
+                    if (!lastVote.getString(Voto.FIELDS.VALUE).equals(payload.getString(Voto.FIELDS.VALUE))) {
+                        lastVote.put(Voto.FIELDS.VALUE, payload.getString(Voto.FIELDS.VALUE));
+                        mongo.updateItem(MongoInterface.COLLECTIONS.VOTOS, lastVote, lastVote);
+                    }
+                    upsertedId = lastVote.get(Voto.FIELDS.MONGOID).toString();
+                } else {
+                    upsertedId = mongo.addItem(MongoInterface.COLLECTIONS.VOTOS, payload);
+                    status = Response.Status.CREATED;
+                }
+                status = Response.Status.OK;
                 msgStatus = "OK";
             } catch (MongoException ex) {
                 msgStatus = "error";
@@ -118,7 +130,6 @@ public class Votos {
                 status = Response.Status.INTERNAL_SERVER_ERROR;
             }
         }
-        
         JSONEntity msgEntity = new JSONEntity();
         msgEntity.addPair("result", msgStatus);
         if (null != upsertedId) {

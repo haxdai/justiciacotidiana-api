@@ -35,6 +35,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 import mx.edu.cide.justiciacotidiana.v1.mongo.MongoInterface;
 import org.bson.types.ObjectId;
+import org.json.simple.JSONObject;
 
 /**
  * Clase utilitaria.
@@ -106,7 +107,7 @@ public class Utils {
                     ret.append(toJSON((BasicDBList)val));
                 } else if (val instanceof String) {
                     String _val = (String) val;
-                    _val = _val.replaceAll("\n", "\\\\n");
+                    _val = JSONObject.escape(_val);
                     ret.append("\"").append(_val).append("\"");
                 } else if (val instanceof Date) {
                     ret.append("\"").append(isoformater.format(val)).append("\"");

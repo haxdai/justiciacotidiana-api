@@ -128,10 +128,10 @@ public class MongoInterface {
         newData.put(FIELD_UPDATED, new Date());
         
         //Eliminar id, si es que viene en el documento.
-        newData.remove(FIELD_ID);
+        //newData.remove(FIELD_ID);
         
         try {
-            tCol.update(query, newData);
+            tCol.save(newData);
         } catch (MongoException ex) {
             return false;
         }

@@ -50,9 +50,11 @@ public class ApplicationConfig extends Application {
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(mx.edu.cide.justiciacotidiana.v1.model.Comentario.class);
+        resources.add(mx.edu.cide.justiciacotidiana.v1.model.Pregunta.class);
         resources.add(mx.edu.cide.justiciacotidiana.v1.model.Propuesta.class);
         resources.add(mx.edu.cide.justiciacotidiana.v1.model.Respuesta.class);
         resources.add(mx.edu.cide.justiciacotidiana.v1.model.Testimonio.class);
+        resources.add(mx.edu.cide.justiciacotidiana.v1.model.Voto.class);
         resources.add(mx.edu.cide.justiciacotidiana.v1.services.Comentarios.class);
         resources.add(mx.edu.cide.justiciacotidiana.v1.services.Preguntas.class);
         resources.add(mx.edu.cide.justiciacotidiana.v1.services.Propuestas.class);
