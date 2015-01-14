@@ -29,12 +29,14 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.MongoException;
+import java.util.Iterator;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import mx.edu.cide.justiciacotidiana.v1.mongo.MongoInterface;
 import mx.edu.cide.justiciacotidiana.v1.utils.Utils;
+import org.bson.types.ObjectId;
 
 /**
  * Recurso que encapsula una propuesta en la base de datos.
@@ -93,6 +95,13 @@ public class Propuesta {
         BasicDBObject commentsContainer = new BasicDBObject("data", comments);
         internal.put(Propuesta.FIELDS.COMMENTS, commentsContainer);
 
+        BasicDBObject question = getRelatedQuestion();
+        if (null != question) {
+            question.remove(Pregunta.FIELDS.CREATED);
+            question.remove(Pregunta.FIELDS.PROPOSALID);
+            internal.put(FIELDS.QUESTION, question);
+        }
+        
         BasicDBObject votes = new BasicDBObject();
 
         //Muy verbose y con muchos niveles, se puede simplificar la estructura
@@ -111,6 +120,30 @@ public class Propuesta {
         return Utils.JSON.toJSON(internal);
     }
     
+    private BasicDBObject getRelatedQuestion() {
+        BasicDBObject query = new BasicDBObject(Pregunta.FIELDS.PROPOSALID, this.id);
+        BasicDBObject ret = (BasicDBObject)Utils.mongo.findOne(MongoInterface.COLLECTIONS.ENCUESTAS, query);
+        
+        if (null != ret) {
+            String questionId = ret.get("_id").toString();
+            BasicDBList answers = (BasicDBList)ret.get(Pregunta.FIELDS.ANSWERS);
+            Iterator ans_it = answers.iterator();
+            while (ans_it.hasNext()) {
+                BasicDBObject next = (BasicDBObject)ans_it.next();
+                ObjectId ansId = (ObjectId)next.get(Respuesta.FIELDS.MONGOID);
+                String _ansId = ansId.toString();
+                
+                BasicDBObject countQuery = new BasicDBObject();
+                countQuery.put(Respuesta.FIELDS.QUESTIONID, questionId);
+                countQuery.put(Respuesta.FIELDS.ANSWERID, _ansId);
+                
+                long count = Utils.mongo.countItems(MongoInterface.COLLECTIONS.RESPUESTAS, countQuery);
+                next.put("count", count);
+            }
+        }
+        return ret;
+    }
+    
     /**
      * Obtiene la lista de comentarios asociados a una propuesta.
      * @return Lista de comentarios.
@@ -120,10 +153,12 @@ public class Propuesta {
         BasicDBObject query = new BasicDBObject(Comentario.FIELDS.PROPOSALID, this.id);
         
         DBCursor com_cur = Utils.mongo.findItems(MongoInterface.COLLECTIONS.COMENTARIOS, query);
+        com_cur.sort(new BasicDBObject(Comentario.FIELDS.CREATED, -1));
         try {
             if (null != com_cur && com_cur.hasNext()) {
                 while (com_cur.hasNext()) {
                     BasicDBObject obj = (BasicDBObject) com_cur.next();
+                    obj.remove(Comentario.FIELDS.PROPOSALID);
                     commentsList.add(obj);
                 }
             }
@@ -195,6 +230,7 @@ public class Propuesta {
         public static final String MONGOID = "_id";
         public static final String SWBID = "swbid";
         public static final String TITLE = "title";
+        public static final String QUESTION = "question";
         public static final String CATEGORY = "category";
         public static final String CATEGORYID = "categoryId";
         public static final String DESCRIPTION = "description";

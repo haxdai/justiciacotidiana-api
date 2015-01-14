@@ -40,17 +40,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import mx.edu.cide.justiciacotidiana.v1.model.Voto;
+import mx.edu.cide.justiciacotidiana.v1.model.Pregunta;
 import mx.edu.cide.justiciacotidiana.v1.mongo.MongoInterface;
 import mx.edu.cide.justiciacotidiana.v1.utils.JSONEntity;
 import mx.edu.cide.justiciacotidiana.v1.utils.Utils;
 
 /**
- * REST WebService para votos
+ * 
  * @author Hasdai Pacheco
  */
-@Path("/votos")
-public class Votos {
+@Path("/preguntas")
+public class Preguntas {
     private static final MongoInterface mongo = MongoInterface.getInstance();
 
     @Context
@@ -60,32 +60,32 @@ public class Votos {
     private HttpHeaders headers;
 
     /** 
-     * Creates a new instance of VotosResource
+     * Creates a new instance of PreguntaResource
      */
-    public Votos() {
+    public Preguntas() {
     }
 
     /**
-     * Retrieves representation of an instance of mx.edu.cide.justiciacotidiana.Votos
+     * Retrieves representation of an instance of mx.edu.cide.justiciacotidiana.Preguntas
      * @return an instance of java.lang.String
      */
     @GET
     @Produces("application/json;charset=utf-8")
     public String getJson() {
         MultivaluedMap<String, String> params = context.getQueryParameters();
-        String proposalId = params.getFirst(Voto.FIELDS.PROPOSALID);
+        String proposalId = params.getFirst(Pregunta.FIELDS.PROPOSALID);
         BasicDBObject query = null;
         
         if (null != proposalId && proposalId.length() > 0) {
-           query = new BasicDBObject(Voto.FIELDS.PROPOSALID, proposalId);
+           query = new BasicDBObject(Pregunta.FIELDS.PROPOSALID, proposalId);
         }
 
         //System.out.println(headers.getRequestHeader(HttpHeaders.AUTHORIZATION).get(0));
-        return mongo.listItemsAsJSON(MongoInterface.COLLECTIONS.VOTOS, query);
+        return mongo.listItemsAsJSON(MongoInterface.COLLECTIONS.ENCUESTAS, query);
     }
 
     /**
-     * POST method for creating an instance of Voto
+     * POST method for creating an instance of Pregunta
      * @param content representation for the new resource
      * @return an HTTP response with content of the created resource
      */
@@ -100,29 +100,16 @@ public class Votos {
         BasicDBObject payload = null;
         
         try {
-            payload = Voto.parse(content);
+            payload = Pregunta.parse(content);
         } catch (JSONParseException ex) {
             status = Response.Status.BAD_REQUEST;
             msg = "Unparseable content";
         }
+
         if (null != payload) {
             try {
-                //Buscar voto del usuario para la misma propuesta
-                BasicDBObject query = new BasicDBObject();
-                query.put(Voto.FIELDS.PROPOSALID, payload.getString(Voto.FIELDS.PROPOSALID));
-                query.put(Voto.FIELDS.FACEBOOKUSER, payload.getString(Voto.FIELDS.FACEBOOKUSER));
-                BasicDBObject lastVote = (BasicDBObject)Utils.mongo.findOne(MongoInterface.COLLECTIONS.VOTOS, query);
-                if(null != lastVote) {
-                    if (!lastVote.getString(Voto.FIELDS.VALUE).equals(payload.getString(Voto.FIELDS.VALUE))) {
-                        lastVote.put(Voto.FIELDS.VALUE, payload.getString(Voto.FIELDS.VALUE));
-                        mongo.updateItem(MongoInterface.COLLECTIONS.VOTOS, lastVote, lastVote);
-                    }
-                    upsertedId = lastVote.get(Voto.FIELDS.MONGOID).toString();
-                } else {
-                    upsertedId = mongo.addItem(MongoInterface.COLLECTIONS.VOTOS, payload);
-                    status = Response.Status.CREATED;
-                }
-                status = Response.Status.OK;
+                upsertedId = mongo.addItem(MongoInterface.COLLECTIONS.ENCUESTAS, payload);
+                status = Response.Status.CREATED;
                 msgStatus = "OK";
             } catch (MongoException ex) {
                 msgStatus = "error";
@@ -130,6 +117,7 @@ public class Votos {
                 status = Response.Status.INTERNAL_SERVER_ERROR;
             }
         }
+        
         JSONEntity msgEntity = new JSONEntity();
         msgEntity.addPair("result", msgStatus);
         if (null != upsertedId) {
@@ -143,12 +131,12 @@ public class Votos {
     }
 
     /**
-     * Método para localizar un testimonio por ID.
-     * @param id ID del testimonio a localizar.
-     * @return Representación JSON del testimonio.
+     * Método para localizar una pregunta por ID.
+     * @param id ID de la pregunta a localizar.
+     * @return Representación JSON de la pregunta.
      */
     @Path("{id}")
-    public Voto getVoto(@PathParam("id") String id) {
-        return Voto.getInstance(id);
+    public Pregunta getPregunta(@PathParam("id") String id) {
+        return Pregunta.getInstance(id);
     }
 }

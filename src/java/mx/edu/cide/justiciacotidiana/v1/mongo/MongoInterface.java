@@ -128,10 +128,10 @@ public class MongoInterface {
         newData.put(FIELD_UPDATED, new Date());
         
         //Eliminar id, si es que viene en el documento.
-        newData.remove(FIELD_ID);
+        //newData.remove(FIELD_ID);
         
         try {
-            tCol.update(query, newData);
+            tCol.save(newData);
         } catch (MongoException ex) {
             return false;
         }
@@ -221,6 +221,20 @@ public class MongoInterface {
     }
     
     /**
+     * Cuenta los elementos de una colección mediante una referencia.
+     * @param collectionName Nombre de la colección.
+     * @param query Objeto de referencia para filtrado.
+     * @return Número de elementos que corresponden con la referencia.
+     */
+    public long countItems(String collectionName, BasicDBObject query) {
+        DBCollection tCol = mongoDB.getCollection(collectionName);
+        if (null == query) {
+            return tCol.count();
+        }
+        return tCol.count(query);
+    }
+    
+    /**
      * Obtiene la lista de los elementos de una colección en formato JSON. Si se proporciona una referencia, se hace un filtrado.
      * @param collectionName Nombre de la colección de donde se extraerán los elementos.
      * @param query Objeto de referencia para la búsqueda.
@@ -259,6 +273,7 @@ public class MongoInterface {
     public class COLLECTIONS {
         public static final String TESTIMONIOS = "Testimonios";
         public static final String ENCUESTAS = "Encuestas";
+        public static final String RESPUESTAS = "Respuestas";
         public static final String COMENTARIOS = "Comentarios";
         public static final String PROPUESTAS = "Propuestas";
         public static final String VOTOS = "Votos";

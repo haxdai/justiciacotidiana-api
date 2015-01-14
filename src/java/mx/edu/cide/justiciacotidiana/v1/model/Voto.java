@@ -119,6 +119,7 @@ public class Voto {
     public static class FIELDS {
         public static final String MONGOID = "_id";
         public static final String FACEBOOKUSER = "fcbookid";
+        public static final String FACEBOOKNAME = "name";
         public static final String PROPOSALID = "proposalId";
         public static final String CREATED = "created";
         public static final String VALUE = "value";
